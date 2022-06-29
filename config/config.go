@@ -24,4 +24,5 @@ type Config struct {
 	Logger   Logger   `yaml:"logger,omitempty"`
 	Database Database `yaml:"logger,omitempty"`
 	Redis    Redis    `yaml:"redis,omitempty"`
+	Server   Server   `yaml:"server,omitempty"`
 }
