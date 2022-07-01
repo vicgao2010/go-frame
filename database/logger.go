@@ -15,16 +15,16 @@ type Config struct {
 	SlowThreshold             time.Duration
 	Colorful                  bool
 	IgnoreRecordNotFoundError bool
-	Level                  log.LogLevel
+	Level                     log.LogLevel
 }
 
 type Logger struct {
 	Config
-	logger        *zap.Logger
+	logger *zap.Logger
 }
 
 func NewLogger(log *zap.Logger) log.Interface {
-	return &Logger{logger:log}
+	return &Logger{logger: log}
 }
 
 func (l *Logger) LogMode(level log.LogLevel) log.Interface {
@@ -53,25 +53,22 @@ func (l Logger) Trace(_ context.Context, begin time.Time, fc func() (string, int
 	switch {
 	case err != nil && l.Level >= log.Error && (!errors.Is(err, log.ErrRecordNotFound) || !l.IgnoreRecordNotFoundError):
 		sql, rows := fc()
-		if rows == -1 {
-			l.logger.Sugar().Error(err, float64(elapsed.Nanoseconds())/1e6, "-", " ", sql)
-		} else {
-			l.logger.Sugar().Error(err, float64(elapsed.Nanoseconds())/1e6, rows, " ", sql)
-		}
+		l.logger.Error(
+			err.Error(), zap.Float64("time", float64(elapsed.Nanoseconds())/1e6),
+			zap.Int64("rows", rows), zap.String("sql", sql),
+		)
 	case elapsed > l.SlowThreshold && l.SlowThreshold != 0 && l.Level >= log.Warn:
 		sql, rows := fc()
 		slowLog := fmt.Sprintf("SLOW SQL >= %v", l.SlowThreshold)
-		if rows == -1 {
-			l.logger.Sugar().Warn(slowLog, float64(elapsed.Nanoseconds())/1e6, "-", " ", sql)
-		} else {
-			l.logger.Sugar().Warn(slowLog, float64(elapsed.Nanoseconds())/1e6, rows, " ", sql)
-		}
+		l.logger.Warn(
+			slowLog, zap.Float64("time", float64(elapsed.Nanoseconds())/1e6),
+			zap.Int64("rows", rows), zap.String("sql", sql),
+		)
 	case l.Level == log.Info:
 		sql, rows := fc()
-		if rows == -1 {
-			l.logger.Sugar().Debug(float64(elapsed.Nanoseconds())/1e6, "-", " ", sql)
-		} else {
-			l.logger.Sugar().Debug(float64(elapsed.Nanoseconds())/1e6, rows, " ", sql)
-		}
+		l.logger.Debug(
+			"", zap.Float64("time", float64(elapsed.Nanoseconds())/1e6),
+			zap.Int64("rows", rows), zap.String("sql", sql),
+		)
 	}
 }

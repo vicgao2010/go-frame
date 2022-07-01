@@ -12,7 +12,7 @@ import (
 
 func New(cfg *config.Config, logger *zap.Logger) (*gorm.DB, func(), error) {
 	prefix := helper.SetDefaultString(cfg.Database.Prefix, "")
-	logger = logger.WithOptions(zap.AddCallerSkip(1))
+	logger = logger.WithOptions(zap.AddCallerSkip(3))
 	level := log.Silent
 	if cfg.App.Debug {
 		level = log.Info
@@ -37,4 +37,3 @@ func New(cfg *config.Config, logger *zap.Logger) (*gorm.DB, func(), error) {
 	}
 	return db, cleanup, err
 }
-
