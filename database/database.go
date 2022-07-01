@@ -24,7 +24,9 @@ func New(cfg *config.Config, logger *zap.Logger) (*gorm.DB, func(), error) {
 		},
 		Logger: NewLogger(logger).LogMode(level),
 	})
-	logger.Sugar().Errorf("db open error %s", err)
+	if err != nil {
+		logger.Sugar().Errorf("db open error %s", err)
+	}
 	Db, err := db.DB()
 	Db.SetMaxIdleConns(helper.SetDefaultInt(cfg.Database.MaxIdle, 5))
 	Db.SetMaxOpenConns(helper.SetDefaultInt(cfg.Database.MaxOpen, 10))
