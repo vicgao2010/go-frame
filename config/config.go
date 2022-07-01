@@ -5,16 +5,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	EnvLocal       = "local"
-	EnvProduction  = "production"
-	EnvDevelopment = "development"
-)
-
 func New(file *viper.Viper) *Config {
 	var cfg *Config
 	if err := file.Unmarshal(&cfg); err != nil {
-		fmt.Printf("err:%s", err)
+		panic(fmt.Sprintf("err:%s", err))
 	}
 	return cfg
 }
